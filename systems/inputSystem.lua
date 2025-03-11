@@ -110,23 +110,12 @@ function inputSystem:trySelectVector(x, y)
         self.currentSelctedVecIndex = i
         return true
     else
+        if self.currentSelectedVec then
+            self.currentSelectedVec.highlighted = false
+        end
         self.currentSelectedVec = nil
         self.lastSelectedVec = nil
         return false
-    end
-end
-
-function inputSystem:onclick(x, y)
-    local vec = coordinateSystem:getVectorAtPosition(x, y)
-
-    if vec then
-        self.currentSelectedVec = vec
-        self:highlightSelectedVector()
-    else
-        self.currentSelectedVec = nil
-        if self.lastSelectedVec then
-            self.lastSelectedVec.highlighted = false
-        end
     end
 end
 
