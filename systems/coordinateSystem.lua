@@ -42,8 +42,8 @@ function coordinateSystem:addPoint(x, y)
 end
 
 function coordinateSystem:addVector(startX, startY, endX, endY)
-    local p1 = self:addPoint(startX, startY)
-    local p2 = self:addPoint(endX, endY)
+    local p1 = Point(startX, startY)
+    local p2 = Point(endX, endY)
     local newVector = Vec(p1, p2)
     table.insert(self.vectors, newVector)
 
@@ -51,10 +51,6 @@ function coordinateSystem:addVector(startX, startY, endX, endY)
 end
 
 function coordinateSystem:removeVector(index)
-    print(index)
-    print(#self.points)
-    table.remove(self.points, index)
-    table.remove(self.points, index)
     table.remove(self.vectors, index)
 end
 
