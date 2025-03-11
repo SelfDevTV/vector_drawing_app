@@ -1,19 +1,39 @@
+local Point   = require "entities.Point"
+local Vec     = require "entities.Vec"
 local numFont = love.graphics.newFont(10)
 love.graphics.setFont(numFont)
 
-local fontWidth = numFont:getWidth("0")
-local fontHeight = numFont:getHeight("0")
 
 local coordinateSystem = {
     -- size in pixels per unit
     unitSize = 20,
-
+    points = {},
+    vectors = {}
 }
 
-function coordinateSystem:drawPoint(x, y)
-    local ux, uy = self:getPoint(x, y)
-    love.graphics.circle("fill", ux, uy, 3)
-    love.graphics.print("(" .. x .. ", " .. y .. ")", ux + 5, uy - 5)
+function coordinateSystem:pixelToUnit(pixelX, pixelY)
+    local unitX = pixelX / self.unitSize - love.graphics.getWidth() / 2 / self.unitSize
+    local unitY = love.graphics.getHeight() / 2 / self.unitSize - pixelY / self.unitSize
+
+    unitX = math.floor(unitX + 0.5)
+    unitY = math.floor(unitY + 0.5)
+
+    return unitX, unitY
+end
+
+function coordinateSystem:addPoint(x, y)
+    local newPoint = Point(x, y)
+    table.insert(self.points, newPoint)
+    return newPoint
+end
+
+function coordinateSystem:addVector(startX, startY, endX, endY)
+    local p1 = Point(startX, startY)
+    local p2 = Point(endX, endY)
+    local newVector = Vec(p1, p2)
+    table.insert(self.vectors, newVector)
+    table.insert(self.points, p1)
+    table.insert(self.points, p2)
 end
 
 function coordinateSystem:getPoint(x, y)
@@ -22,7 +42,7 @@ function coordinateSystem:getPoint(x, y)
     return unitX, unitY
 end
 
-function coordinateSystem:draw()
+function coordinateSystem:drawCoordinateGrid()
     love.graphics.setColor(0.5, 0.5, 0.5, 0.2)
     for x = 0, love.graphics.getWidth(), self.unitSize do
         love.graphics.line(x, 0, x, love.graphics.getHeight())
@@ -47,6 +67,24 @@ function coordinateSystem:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.line(love.graphics.getWidth() / 2, 0, love.graphics.getWidth() / 2, love.graphics.getHeight())
     love.graphics.line(0, love.graphics.getHeight() / 2, love.graphics.getWidth(), love.graphics.getHeight() / 2)
+end
+
+function coordinateSystem:drawPoints()
+    for index, point in ipairs(self.points) do
+        point:draw(self)
+    end
+end
+
+function coordinateSystem:drawVectors()
+    for index, v in ipairs(self.vectors) do
+        v:draw(self)
+    end
+end
+
+function coordinateSystem:draw()
+    coordinateSystem:drawCoordinateGrid()
+    coordinateSystem:drawPoints()
+    coordinateSystem:drawVectors()
 end
 
 return coordinateSystem

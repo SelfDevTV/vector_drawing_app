@@ -1,17 +1,24 @@
+Vector = require("libs.vector")
+Inspect = require("libs.inspect")
+Class = require("libs.class")
+
 local coordinateSystem = require "systems.coordinateSystem"
+local inputSystem = require "systems.inputSystem"
+
 function love.load()
     love.window.setTitle("Vector Drawing App")
+    -- coordinateSystem:addPoint(2, 2)
+
+    coordinateSystem:addVector(2, 2, 3, 3)
 end
 
 function love.update(dt)
     -- Update your logic here
+    inputSystem:update(dt)
 end
 
 function love.draw()
     love.graphics.print("Welcome to Vector Drawing App!", 100, 100)
     coordinateSystem:draw()
-    coordinateSystem:drawPoint(2, 3)
-    coordinateSystem:drawPoint(8, 9)
-    coordinateSystem:drawPoint(-2, 1)
-    coordinateSystem:drawPoint(-8, -9)
+    inputSystem:draw()
 end
