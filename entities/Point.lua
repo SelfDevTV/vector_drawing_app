@@ -5,7 +5,7 @@ local Point = Class {
 }
 
 function Point:draw(coordinateSystem)
-    local ux, uy = coordinateSystem:getPoint(self.position.x, self.position.y)
+    local ux, uy = coordinateSystem:getPointCoordinates(self.position.x, self.position.y)
     love.graphics.circle("fill", ux, uy, 3)
     love.graphics.print("(" .. self.position.x .. ", " .. self.position.y .. ")", ux + 5, uy - 5)
 end

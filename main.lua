@@ -17,6 +17,10 @@ function love.update(dt)
     inputSystem:update(dt)
 end
 
+function love.mousepressed(x, y, btn)
+    inputSystem:onclick(x, y)
+end
+
 function love.draw()
     love.graphics.print("Welcome to Vector Drawing App!", 100, 100)
     coordinateSystem:draw()
