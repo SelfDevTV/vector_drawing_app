@@ -4,7 +4,8 @@ local inputSystem = {
     mouseDownX = 0,
     mouseDownY = 0,
     currentSelectedVec = nil,
-    lastSelectedVec = nil
+    lastSelectedVec = nil,
+    mouseOverVector = false
 }
 
 function inputSystem:update(dt)
@@ -23,6 +24,9 @@ function inputSystem:update(dt)
             local x = love.mouse.getX()
             local y = love.mouse.getY()
             self:onmouserelease()
+        end
+        if not self.currentSelectedVec then
+            self:hoverVector(love.mouse.getX(), love.mouse.getY())
         end
     end
 end
@@ -75,6 +79,15 @@ function inputSystem:getNearestPointToMouse()
     local unitX, unitY = coordinateSystem:pixelToUnit(x, y)
     local pixelX, pixelY = coordinateSystem:getPointCoordinates(unitX, unitY)
     return pixelX, pixelY
+end
+
+function inputSystem:hoverVector(x, y)
+    local vec = coordinateSystem:getVectorAtPosition(x, y)
+    if vec then
+        self.mouseOverVector = true
+    else
+        self.mouseOverVector = false
+    end
 end
 
 function inputSystem:trySelectVector(x, y)
@@ -161,13 +174,19 @@ end
 
 function inputSystem:drawFromStartToCurrentMouse()
     local currentX, currentY = self:getNearestPointToMouse()
-    love.graphics.setColor(1, 0, 0)
-    love.graphics.circle("fill", currentX, currentY, 3)
     if love.mouse.isDown(1) and self.mouseDown then
         local unitStartX, unitStartY = coordinateSystem:pixelToUnit(self.mouseDownX, self.mouseDownY)
         local startX, startY = coordinateSystem:getPointCoordinates(unitStartX, unitStartY)
         love.graphics.setColor(1, 0, 0)
         love.graphics.line(startX, startY, currentX, currentY)
+    end
+end
+
+function inputSystem:drawMouseCursor()
+    if self.mouseOverVector then
+        love.mouse.setCursor(love.mouse.getSystemCursor("hand"))
+    else
+        love.mouse.setCursor(love.mouse.getSystemCursor("arrow"))
     end
 end
 
@@ -182,7 +201,11 @@ function inputSystem:createVector()
 end
 
 function inputSystem:draw()
-    self:drawMouseHoverPointIndicator()
+    self:drawMouseCursor()
+    if not self.currentSelectedVec then
+        print(" no selected vector")
+        self:drawMouseHoverPointIndicator()
+    end
     self:drawFromStartToCurrentMouse()
 end
 
