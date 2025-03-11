@@ -14,6 +14,7 @@ local coordinateSystem = {
     vectors = {}
 }
 
+
 -- gets a point in unit coordinates rounded to the nearest whole number
 function coordinateSystem:pixelToUnit(pixelX, pixelY)
     local unitX = pixelX / self.unitSize - love.graphics.getWidth() / 2 / self.unitSize
@@ -75,6 +76,22 @@ function coordinateSystem:getVectorAtPosition(pixelX, pixelY)
         end
     end
     return nil
+end
+
+function coordinateSystem:getVectorPointOnPosition(pixelX, pixelY)
+    local vec = self:getVectorAtPosition(pixelX, pixelY)
+    if vec then
+        local pointA = vec.startPoint
+        local pointB = vec.endPoint
+        local ux, uy = self:getPointCoordinates(pointA.position.x, pointA.position.y)
+        local vx, vy = self:getPointCoordinates(pointB.position.x, pointB.position.y)
+        if pixelX >= ux - detectionRadius and pixelX <= ux + detectionRadius and pixelY >= uy - detectionRadius and pixelY <= uy + detectionRadius then
+            return pointA
+        end
+        if pixelX >= vx - detectionRadius and pixelX <= vx + detectionRadius and pixelY >= vy - detectionRadius and pixelY <= vy + detectionRadius then
+            return pointB
+        end
+    end
 end
 
 -- gets a point in pixel coordinates

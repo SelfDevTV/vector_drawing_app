@@ -6,7 +6,9 @@ local inputSystem = {
     currentSelectedVec = nil,
     currentSelctedVecIndex = nil,
     lastSelectedVec = nil,
-    mouseOverVector = false
+    mouseOverVector = false,
+    currentSelectedPoint = nil,
+
 }
 
 function inputSystem:update(dt)
@@ -50,7 +52,11 @@ function inputSystem:onDrag()
     if not self.currentSelectedVec then
         self:drawFromStartToCurrentMouse()
     else
-        self:moveSelectedVector()
+        if self.currentSelectedPoint then
+            self:moveSelectedPoint()
+        else
+            self:moveSelectedVector()
+        end
     end
 end
 
@@ -63,6 +69,7 @@ function inputSystem:onmouserelease()
             self:createVector()
         end
     else
+        self.currentSelectedPoint = nil
         self:snapVectorToGrid()
     end
 end
@@ -101,6 +108,10 @@ end
 function inputSystem:trySelectVector(x, y)
     local vec, i = coordinateSystem:getVectorAtPosition(x, y)
     if vec then
+        local point = coordinateSystem:getVectorPointOnPosition(x, y)
+        if point then
+            self.currentSelectedPoint = point
+        end
         if self.lastSelectedVec then
             self.lastSelectedVec.highlighted = false
         else
@@ -131,6 +142,9 @@ function inputSystem:highlightSelectedVector()
 end
 
 function inputSystem:moveSelectedVector()
+    if self.currentSelectedPoint then
+        return
+    end
     if self.mouseDown and love.mouse.isDown(1) and self.currentSelectedVec then
         local dx = love.mouse.getX() - self.mouseDownX
         local dy = love.mouse.getY() - self.mouseDownY
@@ -162,6 +176,27 @@ function inputSystem:moveSelectedVector()
         self.mouseDownX = love.mouse.getX()
         self.mouseDownY = love.mouse.getY()
     end
+end
+
+function inputSystem:moveSelectedPoint()
+    local dx = love.mouse.getX() - self.mouseDownX
+    local dy = love.mouse.getY() - self.mouseDownY
+
+
+    local pointInPixelsX, pointInPixelsY = coordinateSystem:getPointCoordinates(
+        self.currentSelectedPoint.position.x,
+        self.currentSelectedPoint.position.y)
+
+    pointInPixelsX = pointInPixelsX + dx
+    pointInPixelsY = pointInPixelsY + dy
+
+    local unitX, unitY = coordinateSystem:fpixelToUnit(pointInPixelsX, pointInPixelsY)
+
+    self.currentSelectedPoint.position.x = unitX
+    self.currentSelectedPoint.position.y = unitY
+    -- update the last mouse position
+    self.mouseDownX = love.mouse.getX()
+    self.mouseDownY = love.mouse.getY()
 end
 
 function inputSystem:drawMouseHoverPointIndicator()
