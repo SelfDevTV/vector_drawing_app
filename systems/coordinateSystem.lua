@@ -42,18 +42,25 @@ function coordinateSystem:addPoint(x, y)
 end
 
 function coordinateSystem:addVector(startX, startY, endX, endY)
-    local p1 = Point(startX, startY)
-    local p2 = Point(endX, endY)
+    local p1 = self:addPoint(startX, startY)
+    local p2 = self:addPoint(endX, endY)
     local newVector = Vec(p1, p2)
     table.insert(self.vectors, newVector)
-    table.insert(self.points, p1)
-    table.insert(self.points, p2)
+
     return newVector
+end
+
+function coordinateSystem:removeVector(index)
+    print(index)
+    print(#self.points)
+    table.remove(self.points, index)
+    table.remove(self.points, index)
+    table.remove(self.vectors, index)
 end
 
 function coordinateSystem:getVectorAtPosition(pixelX, pixelY)
     -- along the vector check if the clicked point is on the vector + the detection radius
-    for _, v in ipairs(self.vectors) do
+    for i, v in ipairs(self.vectors) do
         local ux, uy = self:getPointCoordinates(v.startPoint.position.x, v.startPoint.position.y)
         local vx, vy = self:getPointCoordinates(v.endPoint.position.x, v.endPoint.position.y)
         local dx = vx - ux
@@ -67,7 +74,7 @@ function coordinateSystem:getVectorAtPosition(pixelX, pixelY)
             local projY = uy + t * dy
             local distance = math.sqrt((pixelX - projX) ^ 2 + (pixelY - projY) ^ 2)
             if distance < detectionRadius then
-                return v
+                return v, i
             end
         end
     end

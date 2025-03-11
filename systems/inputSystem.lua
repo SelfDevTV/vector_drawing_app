@@ -4,6 +4,7 @@ local inputSystem = {
     mouseDownX = 0,
     mouseDownY = 0,
     currentSelectedVec = nil,
+    currentSelctedVecIndex = nil,
     lastSelectedVec = nil,
     mouseOverVector = false
 }
@@ -28,6 +29,13 @@ function inputSystem:update(dt)
         if not self.currentSelectedVec then
             self:hoverVector(love.mouse.getX(), love.mouse.getY())
         end
+    end
+end
+
+function inputSystem:keypressed(key)
+    if self.currentSelectedVec and key == "delete" then
+        coordinateSystem:removeVector(self.currentSelctedVecIndex)
+        self.currentSelectedVec = nil
     end
 end
 
@@ -91,7 +99,7 @@ function inputSystem:hoverVector(x, y)
 end
 
 function inputSystem:trySelectVector(x, y)
-    local vec = coordinateSystem:getVectorAtPosition(x, y)
+    local vec, i = coordinateSystem:getVectorAtPosition(x, y)
     if vec then
         if self.lastSelectedVec then
             self.lastSelectedVec.highlighted = false
@@ -99,6 +107,7 @@ function inputSystem:trySelectVector(x, y)
             self.lastSelectedVec = vec
         end
         self.currentSelectedVec = vec
+        self.currentSelctedVecIndex = i
         return true
     else
         self.currentSelectedVec = nil
@@ -203,7 +212,6 @@ end
 function inputSystem:draw()
     self:drawMouseCursor()
     if not self.currentSelectedVec then
-        print(" no selected vector")
         self:drawMouseHoverPointIndicator()
     end
     self:drawFromStartToCurrentMouse()

@@ -21,8 +21,11 @@ function love.mousepressed(x, y, btn)
     inputSystem:onclick(x, y)
 end
 
+function love.keypressed(key)
+    inputSystem:keypressed(key)
+end
+
 function love.draw()
-    love.graphics.print("Welcome to Vector Drawing App!", 100, 100)
     coordinateSystem:draw()
     inputSystem:draw()
 end
